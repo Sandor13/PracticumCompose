@@ -46,7 +46,7 @@ fun SimpleLazyColumnUnOptimized(customItems: List<String>) {
 
     Box {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(photos) { number ->
+            items(photos, key = { photo -> photo.toInt() }) { number ->
                 PhotoView(number)
             }
         }
