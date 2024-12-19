@@ -3,6 +3,7 @@ package com.practicum.compose
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,11 +13,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Photo
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -28,16 +35,37 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         //enableEdgeToEdge()
         setContent {
-            SimpleLazyColumn(List(1000) { it.toString() })
+            SimpleLazyColumnUnOptimized(List(1000) { it.toString() })
         }
     }
 }
 
 @Composable
-fun SimpleLazyColumn(customItems: List<String>) {
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-        items(customItems) { number ->
-            PhotoView(number)
+fun SimpleLazyColumnUnOptimized(customItems: List<String>) {
+    var photos by rememberSaveable { mutableStateOf(customItems) }
+
+    Box {
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+            items(photos) { number ->
+                PhotoView(number)
+            }
+        }
+
+        Row(modifier = Modifier.align(BottomCenter)) {
+            Button(onClick = {
+                photos = photos.toMutableList().also {
+                    it.add(0, "666")
+                }
+            }) {
+                Text(text = "Add")
+            }
+            Button(onClick = { photos = photos.drop(1) }) {
+                Text(text = "Remove")
+            }
+            Button(onClick = { photos = photos.shuffled() })
+            {
+                Text(text = "Shuffle")
+            }
         }
     }
 }
@@ -75,5 +103,5 @@ fun PhotoView(name: String) {
 @Preview(showBackground = true, widthDp = 320)
 @Composable
 fun SimpleColumnScreenPreview() {
-    SimpleLazyColumn(List(1000) { it.toString() })
+    SimpleLazyColumnUnOptimized(List(1000) { it.toString() })
 }
